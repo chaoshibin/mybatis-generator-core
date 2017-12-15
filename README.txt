@@ -1,40 +1,32 @@
 ====
-       Copyright 2006-2017 the original author or authors.
+       Copyright 2017 the original author or authors.
+	   
+	   1.读取数据库注释
+	   
+	   2.创建service层
+	   
+	   3.在update语句添加空字符串判断
+	   
+	   在 generatorConfig.xml 添加下列配置
+	   
+	    <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.ToStringPlugin" />
 
-       Licensed under the Apache License, Version 2.0 (the "License");
-       you may not use this file except in compliance with the License.
-       You may obtain a copy of the License at
+        <!-- mybatis generator 重写插件 example序列化-->
+        <plugin type="org.mybatis.generator.plugins.CustomSerializablePlugin">
+            <property name="suppressJavaInterface" value="false"/>
+        </plugin>
 
-          http://www.apache.org/licenses/LICENSE-2.0
-
-       Unless required by applicable law or agreed to in writing, software
-       distributed under the License is distributed on an "AS IS" BASIS,
-       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-       See the License for the specific language governing permissions and
-       limitations under the License.
+        <!-- mybatis generator 重写插件 创建service-->
+        <plugin type="org.mybatis.generator.plugins.CustomCreateBeanPlugin">
+            <property name="targetPackage" value="com.jrq.core.service" />
+            <property name="implementationPackage" value="com.jrq.core.service.impl" />
+            <property name="targetProject" value="E:\Workspace\USERAPI\userapi-core\src\main\java" />
+        </plugin>
+        <!-- mybatis generator 重写插件 添加注释-->
+        <commentGenerator type="org.mybatis.generator.plugins.CustomCommentGeneratorPlugin">
+            <property name="suppressAllComments" value="false"/>
+            <property name="suppressDate" value="true"/>
+        </commentGenerator>
 ====
 
-===============================================================================
-Overview
---------
-MyBatis Generator (MBG) is a code generator for the MyBatis (and iBATIS) SQL
-mapping framework.  MBG will introspect database tables (through JDBC
-DatabaseMetaData) and generate SQL Map XML files, Java model object (POJOs)
-that match the table, and (optionally) Java client classes that use the other
-generated objects.
-
-For full documentation, please refer to the user's manual at
-docs/index.html in this distribution.
-
-Dependencies
-------------
-There are no dependencies beyond the JRE.  JRE 5.0 or above is required.
-Also required is a JDBC driver that implements the DatabaseMetaData interface,
-especially the "getColumns" and "getPrimaryKeys" methods.
-
-Support
--------
-Support is provided through the user mailing list.  Mail
-questions or bug reports to:
-
-  mybatis-user@googlegroups.com
