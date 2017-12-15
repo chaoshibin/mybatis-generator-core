@@ -1,34 +1,16 @@
 ====
-       Copyright 2017 the original author or authors.
-	   
-	   一.功能实现：
-	   
-	   1.读取数据库注释
-	   
-	   2.创建service层
-	   
-	   3.在update语句添加空字符串判断
-	   
-	   二.在 generatorConfig.xml 添加下列配置
-	   
-	    <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
-        <plugin type="org.mybatis.generator.plugins.ToStringPlugin" />
+       Copyright 2006-2017 the original author or authors.
 
-        <!-- mybatis generator 重写插件 example序列化-->
-        <plugin type="org.mybatis.generator.plugins.CustomSerializablePlugin">
-            <property name="suppressJavaInterface" value="false"/>
-        </plugin>
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
 
-        <!-- mybatis generator 重写插件 创建service-->
-        <plugin type="org.mybatis.generator.plugins.CustomCreateBeanPlugin">
-            <property name="targetPackage" value="service包名" />
-            <property name="implementationPackage" value="service实现类包名" />
-            <property name="targetProject" value="E:\Work\src\main\java" />
-        </plugin>
-        <!-- mybatis generator 重写插件 添加注释-->
-        <commentGenerator type="org.mybatis.generator.plugins.CustomCommentGeneratorPlugin">
-            <property name="suppressAllComments" value="false"/>
-            <property name="suppressDate" value="true"/>
-        </commentGenerator>
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
 ====
 

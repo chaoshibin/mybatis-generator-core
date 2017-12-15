@@ -50,24 +50,12 @@ public class SimpleSelectAllElementGenerator extends
 
         StringBuilder sb = new StringBuilder();
         sb.append("select "); //$NON-NLS-1$
-        Iterator<IntrospectedColumn> iter = introspectedTable.getAllColumns()
-                .iterator();
-        while (iter.hasNext()) {
-            sb.append(MyBatis3FormattingUtilities.getSelectListPhrase(iter
-                    .next()));
-
-            if (iter.hasNext()) {
-                sb.append(", "); //$NON-NLS-1$
-            }
-
-            if (sb.length() > 80) {
-                answer.addElement(new TextElement(sb.toString()));
-                sb.setLength(0);
-            }
-        }
-
-        if (sb.length() > 0) {
-            answer.addElement(new TextElement(sb.toString()));
+        answer.addElement(new TextElement(sb.toString()));
+        //自定义
+        answer.addElement(getBaseColumnListElement());
+        if (introspectedTable.hasBLOBColumns()) {
+            answer.addElement(new TextElement(",")); //$NON-NLS-1$
+            answer.addElement(getBlobColumnListElement());
         }
 
         sb.setLength(0);
@@ -75,7 +63,8 @@ public class SimpleSelectAllElementGenerator extends
         sb.append(introspectedTable
                 .getAliasedFullyQualifiedTableNameAtRuntime());
         answer.addElement(new TextElement(sb.toString()));
-        
+        answer.addElement(getQueryWhereClauseListElement());
+
         String orderByClause = introspectedTable.getTableConfigurationProperty(PropertyRegistry.TABLE_SELECT_ALL_ORDER_BY_CLAUSE);
         boolean hasOrderBy = StringUtility.stringHasValue(orderByClause);
         if (hasOrderBy) {

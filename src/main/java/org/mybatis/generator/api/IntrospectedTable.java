@@ -174,7 +174,9 @@ public abstract class IntrospectedTable {
         ATTR_MYBATIS3_UPDATE_BY_EXAMPLE_WHERE_CLAUSE_ID,
         
         /** The ATT r_ mybati s3_ sq l_ provide r_ type. */
-        ATTR_MYBATIS3_SQL_PROVIDER_TYPE
+        ATTR_MYBATIS3_SQL_PROVIDER_TYPE,
+
+        ATTR_QUERY_WHERE_CLAUSE_ID
     }
 
     /** The table configuration. */
@@ -806,7 +808,8 @@ public abstract class IntrospectedTable {
         setExampleWhereClauseId("Example_Where_Clause"); //$NON-NLS-1$
         setBaseColumnListId("Base_Column_List"); //$NON-NLS-1$
         setBlobColumnListId("Blob_Column_List"); //$NON-NLS-1$
-        setMyBatis3UpdateByExampleWhereClauseId("Update_By_Example_Where_Clause"); //$NON-NLS-1$
+        setMyBatis3UpdateByExampleWhereClauseId("Update_By_Example_Where_Clause");//$NON-NLS-1$
+        setMyBatis3QueryWhereClause("Query_Where_Clause");
     }
 
     /**
@@ -1828,6 +1831,19 @@ public abstract class IntrospectedTable {
                 InternalAttribute.ATTR_MYBATIS3_SQL_PROVIDER_TYPE,
                 mybatis3SqlProviderType);
     }
+
+
+    public String getMyBatis3QueryWhereClause() {
+        return internalAttributes
+                .get(InternalAttribute.ATTR_QUERY_WHERE_CLAUSE_ID);
+    }
+
+    public void setMyBatis3QueryWhereClause(String queryWhereClause) {
+        internalAttributes.put(
+                InternalAttribute.ATTR_QUERY_WHERE_CLAUSE_ID,
+                queryWhereClause);
+    }
+
     
     /**
      * Gets the target runtime.
