@@ -64,8 +64,6 @@ public class QueryWhereClauseListElementGenerator extends AbstractXmlElementGene
             sb.append(" = "); //$NON-NLS-1$
             sb.append(MyBatis3FormattingUtilities
                     .getParameterClause(introspectedColumn));
-            sb.append(',');
-
             isNotNullElement.addElement(new TextElement(sb.toString()));
         }
         answer.addElement(whereElement);

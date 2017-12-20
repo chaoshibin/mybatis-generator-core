@@ -29,8 +29,8 @@ import java.util.Properties;
  * 功能描述:
  * <p/>
  *
- * @author chaoshibin 新增日期：2017/12/6
- * @author chaoshibin 修改日期：2017/12/6
+ * @author CHAO 新增日期：2017/12/6
+ * @author CHAO 修改日期：2017/12/6
  * @version 1.0.0
  * @since 1.0.0
  */
@@ -51,9 +51,9 @@ public class CustomCommentGeneratorPlugin implements CommentGenerator {
         if (!this.suppressAllComments) {
             StringBuilder sb = new StringBuilder();
             field.addJavaDocLine("/**");
-            field.addJavaDocLine(" * chinese : " + introspectedColumn.getRemarks());
-            sb.append(" * column : ").append(introspectedColumn.getActualColumnName());
-            field.addJavaDocLine(sb.toString());
+            field.addJavaDocLine(" * " + introspectedColumn.getRemarks());
+            //sb.append(" * column : ").append(introspectedColumn.getActualColumnName());
+            //field.addJavaDocLine(sb.toString());
             field.addJavaDocLine(" */");
         }
     }
@@ -68,12 +68,12 @@ public class CustomCommentGeneratorPlugin implements CommentGenerator {
         if (!this.suppressAllComments) {
             StringBuilder sb = new StringBuilder();
             topLevelClass.addJavaDocLine("/**");
-            sb.append(" * table : ").append(introspectedTable.getFullyQualifiedTable());
+            sb.append(" * ").append(introspectedTable.getTableConfiguration());
             topLevelClass.addJavaDocLine(sb.toString());
             topLevelClass.addJavaDocLine(" * ");
             SimpleDateFormat  sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             String date = sdf.format(new Date());
-            topLevelClass.addJavaDocLine(" * @author Mybatis Generator "+date);
+            topLevelClass.addJavaDocLine(" * @author CHAO "+date);
             topLevelClass.addJavaDocLine(" */");
         }
     }

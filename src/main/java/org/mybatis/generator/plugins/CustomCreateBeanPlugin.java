@@ -29,8 +29,8 @@ import java.util.List;
  * 功能描述:
  * <p/>
  *
- * @author chaoshibin 新增日期：2017/12/6
- * @author chaoshibin 修改日期：2017/12/6
+ * @author CHAO 新增日期：2017/12/6
+ * @author CHAO 修改日期：2017/12/6
  * @version 1.0.0
  * @since 1.0.0
  */
@@ -51,7 +51,7 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
     private FullyQualifiedJavaType pojoCriteriaType;
     private FullyQualifiedJavaType autowired;
     private FullyQualifiedJavaType service;
-    private FullyQualifiedJavaType returnType;
+    private FullyQualifiedJavaType apiModel;
     private String servicePack;
     private String serviceImplPack;
     private String project;
@@ -231,7 +231,7 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
         String date = sdf.format(new Date());
         StringBuilder sb = new StringBuilder();
         field.addJavaDocLine("/**");
-        sb.append(" * @author Mybatis Generator ");
+        sb.append(" * @author CHAO ");
         sb.append(date);
         field.addJavaDocLine(sb.toString());
         field.addJavaDocLine(" */");

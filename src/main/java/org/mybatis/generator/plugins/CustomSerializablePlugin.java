@@ -15,6 +15,8 @@
  */
 package org.mybatis.generator.plugins;
 
+import com.google.common.base.CaseFormat;
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
 
@@ -25,17 +27,34 @@ import java.util.List;
  * 功能描述:
  * <p/>
  *
- * @author chaoshibin 新增日期：2017/12/13
- * @author chaoshibin 修改日期：2017/12/13
+ * @author CHAO 新增日期：2017/12/13
+ * @author CHAO 修改日期：2017/12/13
  * @version 1.0.0
  * @since 1.0.0
  */
 public class CustomSerializablePlugin extends SerializablePlugin {
     private volatile FullyQualifiedJavaType serializable;
+    private volatile FullyQualifiedJavaType apiModel;
+    private volatile FullyQualifiedJavaType apiModelProperty;
+    private volatile FullyQualifiedJavaType data;
+    private boolean swagger = false;
+    private boolean lombok = false;
 
     public CustomSerializablePlugin() {
         super();
         serializable = new FullyQualifiedJavaType("java.io.Serializable");
+        apiModel = new FullyQualifiedJavaType("io.swagger.annotations.ApiModel");
+        apiModelProperty = new FullyQualifiedJavaType("io.swagger.annotations.ApiModelProperty");
+        data = new FullyQualifiedJavaType("lombok.Data");
+    }
+
+
+    /**
+     * 初始化配置
+     */
+    private void initCondition() {
+        swagger = Boolean.parseBoolean(properties.getProperty("swagger"));
+        lombok = Boolean.parseBoolean(properties.getProperty("lombok"));
     }
 
     @Override
@@ -59,9 +78,31 @@ public class CustomSerializablePlugin extends SerializablePlugin {
 
     @Override
     public boolean modelBaseRecordClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+        initCondition();
+        if (swagger) {
+            topLevelClass.addImportedType(apiModel);
+            topLevelClass.addImportedType(apiModelProperty);
+            topLevelClass.addAnnotation("@ApiModel");
+            List<Field> fields = topLevelClass.getFields();
+            for (Field field : fields) {
+                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, "CONSTANT_NAME");
+                String columnName = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, field.getName());
+                String value = introspectedTable.getColumn(columnName).getRemarks();
+                field.addAnnotation("@ApiModelProperty(\"" + value + "\")");
+            }
+        }
+        if (lombok) {
+            topLevelClass.addImportedType(data);
+            topLevelClass.addAnnotation("@Data");
+        }
         topLevelClass.addImportedType(serializable);
         makeSerializableInnerClass(topLevelClass, introspectedTable);
         return true;
+    }
+
+    public static void main(String[] args) {
+        String id = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, "userId");
+        System.out.println(id);
     }
 
     @Override
