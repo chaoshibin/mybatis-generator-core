@@ -129,11 +129,6 @@ public class InsertSelectiveElementGenerator extends
             sb.setLength(0);
             sb.append(introspectedColumn.getJavaProperty());
             sb.append(" != null"); //$NON-NLS-1$
-            if(introspectedColumn.isStringColumn() || introspectedColumn.isSequenceColumn()){
-                sb.append(" and ");
-                sb.append(introspectedColumn.getJavaProperty());
-                sb.append(" != ''");
-            }
             valuesNotNullElement.addAttribute(new Attribute(
                     "test", sb.toString())); //$NON-NLS-1$
 
