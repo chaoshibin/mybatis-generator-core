@@ -1,17 +1,17 @@
 /**
- *    Copyright 2006-2017 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2006-2018 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.mybatis.generator.plugins;
 
@@ -39,6 +39,7 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
     private FullyQualifiedJavaType slf4jLogger;
     private FullyQualifiedJavaType slf4jLoggerFactory;
     private FullyQualifiedJavaType serviceType;
+    private FullyQualifiedJavaType mapperInterfaceType;
     private FullyQualifiedJavaType daoType;
     private FullyQualifiedJavaType interfaceType;
     private FullyQualifiedJavaType serviceInterfaceType;
@@ -46,6 +47,7 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
     private FullyQualifiedJavaType extendServiceInterfaceType;
     private FullyQualifiedJavaType extendAbstractServiceType;
     private FullyQualifiedJavaType extendMapperType;
+    private FullyQualifiedJavaType exMapperType;
 
     private FullyQualifiedJavaType pojoType;
     private FullyQualifiedJavaType pojoCriteriaType;
@@ -54,8 +56,11 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
     private FullyQualifiedJavaType apiModel;
     private String servicePack;
     private String serviceImplPack;
+    private String mapperInterfacePack;
     private String project;
-    private String pojoUrl;
+    private String pojoPack;
+    private String examplePack;
+    private String exMapperPack;
     private List<JavaElement> javaElements;
     /**
      * 所有的方法
@@ -84,13 +89,17 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
 
         this.servicePack = properties.getProperty("targetPackage");
         this.serviceImplPack = properties.getProperty("implementationPackage");
+        this.mapperInterfacePack = properties.getProperty("mapperInterfacePack");
         this.project = properties.getProperty("targetProject");
-        this.pojoUrl = context.getJavaModelGeneratorConfiguration().getTargetPackage();
-
+        this.pojoPack = context.getJavaModelGeneratorConfiguration().getTargetPackage();
+        int indexOf = pojoPack.lastIndexOf(".");
+        this.examplePack = pojoPack.substring(0, indexOf + 1) + "example";
         if (this.enableAnnotation) {
             autowired = new FullyQualifiedJavaType("org.springframework.beans.factory.annotation.Autowired");
             service = new FullyQualifiedJavaType("org.springframework.stereotype.Service");
         }
+        exMapperPack = context.getJavaClientGeneratorConfiguration().getTargetPackage();
+
         return true;
     }
 
@@ -102,7 +111,7 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
         List<GeneratedJavaFile> files = new ArrayList<GeneratedJavaFile>();
         // 取Service名称【com.jrq.service.PetService】
         String table = introspectedTable.getBaseRecordType();
-        String tableName = table.replaceAll(this.pojoUrl + ".", "");
+        String tableName = table.replaceAll(this.pojoPack + ".", "");
 
         interfaceType = new FullyQualifiedJavaType(servicePack + "." + tableName + "Service");
 
@@ -111,21 +120,24 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
         extendServiceInterfaceType = new FullyQualifiedJavaType(servicePack + "." + "Service<" + tableName + "," + tableName + "Example>");
         extendAbstractServiceType = new FullyQualifiedJavaType("AbstractService<" + tableName + "," + tableName + "Example>");
         extendMapperType = new FullyQualifiedJavaType("IMapper<" + tableName + "," + tableName + "Example>");
-
         // 【com.jrq.mapper.PetMapper】
         daoType = new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType());
 
         // 【com.jrq.service.impl.PetServiceImpl】logger.info(toLowerCase(daoType.getShortName()));
         serviceType = new FullyQualifiedJavaType(serviceImplPack + "." + tableName + "ServiceImpl");
 
+        mapperInterfaceType = new FullyQualifiedJavaType(mapperInterfacePack + ".IMapper");
+
         // 【com.jrq.domain.Pet】
-        pojoType = new FullyQualifiedJavaType(pojoUrl + "." + tableName);
+        pojoType = new FullyQualifiedJavaType(pojoPack + "." + tableName);
 
         // 【com.jrq.domain.Criteria】
-        pojoCriteriaType = new FullyQualifiedJavaType(pojoUrl + "." + tableName + "Example");
+        pojoCriteriaType = new FullyQualifiedJavaType(examplePack + "." + tableName + "Example");
 
+        exMapperType = new FullyQualifiedJavaType(exMapperPack + "." + tableName + "ExMapper");
         createMapper(files);
         createService(files);
+        createExMapper(files);
         createServiceImpl(introspectedTable, tableName, files);
 
         for (JavaElement javaElement : javaElements) {
@@ -142,6 +154,18 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
         mapperInterface.setVisibility(JavaVisibility.PUBLIC);
         mapperInterface.addImportedType(pojoType);
         mapperInterface.addImportedType(pojoCriteriaType);
+        mapperInterface.addImportedType(mapperInterfaceType);
+        GeneratedJavaFile file = new GeneratedJavaFile(mapperInterface, project, context.getJavaFormatter());
+        files.add(file);
+    }
+
+    private void createExMapper(List<GeneratedJavaFile> files) {
+        Interface mapperInterface = new Interface(exMapperType);
+        javaElements.add(mapperInterface);
+
+        mapperInterface.addSuperInterface(daoType);
+        mapperInterface.setVisibility(JavaVisibility.PUBLIC);
+        mapperInterface.addImportedType(daoType);
         GeneratedJavaFile file = new GeneratedJavaFile(mapperInterface, project, context.getJavaFormatter());
         files.add(file);
     }
@@ -162,7 +186,7 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
     private void createServiceImpl(IntrospectedTable introspectedTable, String tableName, List<GeneratedJavaFile> files) {
         TopLevelClass topLevelClass = new TopLevelClass(serviceType);
         javaElements.add(topLevelClass);
-        topLevelClass.addImportedType(daoType);
+        topLevelClass.addImportedType(exMapperType);
         topLevelClass.addImportedType(interfaceType);
         topLevelClass.addImportedType(pojoType);
         topLevelClass.addImportedType(pojoCriteriaType);
@@ -193,7 +217,7 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
     protected Method addMapper(IntrospectedTable introspectedTable, String tableName) {
         Method method = new Method();
         method.setName("getMapper");
-        method.setReturnType(new FullyQualifiedJavaType(tableName + "Mapper"));
+        method.setReturnType(new FullyQualifiedJavaType(tableName + "ExMapper"));
         method.setVisibility(JavaVisibility.PUBLIC);
         StringBuilder sb = new StringBuilder();
         sb.append("return mapper;");
@@ -212,8 +236,8 @@ public class CustomCreateBeanPlugin extends PluginAdapter {
         Field field = new Field();
 
         field.setName("mapper");
-        topLevelClass.addImportedType(daoType);
-        field.setType(daoType);
+        topLevelClass.addImportedType(exMapperType);
+        field.setType(exMapperType);
         field.setVisibility(JavaVisibility.PRIVATE);
         if (enableAnnotation) {
             field.addAnnotation("@Autowired");
